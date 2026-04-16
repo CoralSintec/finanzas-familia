@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzas Familiares</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Gris muy oscuro y Azul oscuro */
+        body { background-color: #0f172a; } 
+        .card-gasto { background-color: #1e293b; border: 1px solid #334155; }
+        .header-azul { background-color: #1e3a8a; border-bottom: 4px solid #1d4ed8; }
+        .badge-pendiente { background-color: #7f1d1d; color: #fecaca; }
+        .badge-pagado { background-color: #064e3b; color: #d1fae5; }
+    </style>
+</head>
+<body class="text-slate-200 font-sans min-h-screen">
+
+    <header class="header-azul p-6 shadow-2xl">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-black text-white tracking-tighter uppercase">Katy Home App</h1>
+                <p class="text-blue-200 text-xs font-bold tracking-widest">SISTEMA DE FINANZAS</p>
+            </div>
+            <i class="fas fa-shield-halved text-blue-300 text-3xl"></i>
+        </div>
+    </header>
+
+    <main class="p-4 max-w-md mx-auto">
+        
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="card-gasto p-4 rounded-2xl shadow-lg border-t-4 border-blue-500">
+                <p class="text-blue-400 text-[10px] uppercase font-black mb-1">Tasa BCV (Oficial)</p>
+                <p id="val-bcv" class="text-2xl font-mono font-bold text-white">---</p>
+            </div>
+            <div class="card-gasto p-4 rounded-2xl shadow-lg border-t-4 border-yellow-500">
+                <p class="text-yellow-500 text-[10px] uppercase font-black mb-1">Tasa Binance (P2P)</p>
+                <p id="val-binance" class="text-2xl font-mono font-bold text-white">---</p>
+            </div>
+        </div>
+
+        <h2 class="text-sm font-black text-slate-400 mb-4 uppercase tracking-widest flex items-center">
+            <i class="fas fa-wallet mr-2 text-blue-500"></i> Control de Gastos
+        </h2>
+
+        <div id="lista-gastos" class="space-y-4">
+            <div class="text-center py-10">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div>
+                <p class="text-slate-500 text-sm">Sincronizando con Google Sheets...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ESTA ES TU URL REAL CONECTADA
+        const URL_CEREBRO = "https://script.google.com/macros/s/AKfycbxOZghPKDZbmwNISyRVl2c6smuMe5WyXYSEbTKWvioE0R9oIXB7GylQIerF1dmz32Nd/exec";
+
+        async function obtenerDatos() {
+            try {
+                const response = await fetch(URL_CEREBRO);
+                const data = await response.json();
+                
+                if (data.length > 0) {
+                    // Actualizar las tasas en el encabezado usando el primer registro
+                    document.getElementById('val-bcv').innerText = data[0].TASA_BCV + " Bs";
+                    document.getElementById('val-binance').innerText = data[0].TASA_BINANCE + " Bs";
+
+                    const contenedor = document.getElementById('lista-gastos');
+                    contenedor.innerHTML = ""; // Limpiar el cargando
+
+                    data.forEach(item => {
+                        const esPagado = item.ESTADO === "PAGADO";
+                        
+                        const htmlGasto = `
+                            <div class="card-gasto p-5 rounded-2xl shadow-md relative overflow-hidden">
+                                <div class="flex justify-between items-start relative z-10">
+                                    <div>
+                                        <h3 class="font-bold text-lg text-white leading-tight">${item.DESCRIPCION}</h3>
+                                        <p class="text-[10px] text-blue-400 font-bold uppercase mt-1">
+                                            <i class="fas fa-credit-card mr-1"></i> ${item.BILLETERA || 'Efectivo'}
+                                        </p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-xl font-black text-white">$${Number(item.MONTO_REAL_USD).toFixed(2)}</p>
+                                        <p class="text-[11px] text-slate-400">Bs. ${Number(item.MONTO_BS).toLocaleString()}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 flex justify-between items-center border-t border-slate-700 pt-3">
+                                    <span class="text-[9px] font-black px-2 py-1 rounded-md uppercase ${esPagado ? 'badge-pagado' : 'badge-pendiente'}">
+                                        ${item.ESTADO}
+                                    </span>
+                                    <p class="text-[10px] text-slate-500 font-mono italic">Base: $${item.MONTO_USD}</p>
+                                </div>
+                            </div>
+                        `;
+                        contenedor.innerHTML += htmlGasto;
+                    });
+                }
+            } catch (error) {
+                console.error("Error cargando datos:", error);
+                document.getElementById('lista-gastos').innerHTML = `
+                    <div class="bg-red-900/20 p-4 rounded-xl border border-red-800 text-center">
+                        <p class="text-red-400 text-sm">Error de conexión.</p>
+                        <p class="text-[10px] text-red-500 mt-2">Asegúrate de que la hoja se llame GASTOS y la URL sea correcta.</p>
+                    </div>
+                `;
+            }
+        }
+
+        obtenerDatos();
+    </script>
+</body>
+</html>
