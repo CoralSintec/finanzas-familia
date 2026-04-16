@@ -7,152 +7,179 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Estilo Industrial: Gris Carbón y Azul Eléctrico */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap');
+        
         :root {
-            --dark-bg: #0f172a;
-            --card-bg: #1e293b;
-            --electric-blue: #2563eb;
-            --accent-blue: #1e3a8a;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --blue-accent: #2563eb;
+            --blue-deep: #1e3a8a;
         }
-        body { background-color: var(--dark-bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .industrial-card { 
-            background: linear-gradient(145deg, #1e293b, #111827);
+
+        body { 
+            background-color: var(--bg-dark); 
+            font-family: 'Inter', sans-serif;
+            color: #f1f5f9;
+        }
+
+        .industrial-border {
             border: 1px solid #334155;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
-        .header-gradient {
-            background: linear-gradient(to right, #1e3a8a, #0f172a);
-            border-bottom: 3px solid var(--electric-blue);
+
+        .header-glass {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--blue-accent);
         }
-        .shimmer {
-            background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+
+        .font-mono-custom { font-family: 'JetBrains Mono', monospace; }
+        
+        .status-badge {
+            font-size: 10px;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+
+        /* Animación de carga */
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #1e3a8a;
+            border-bottom-color: #2563eb;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="text-slate-200 min-h-screen">
+<body class="min-h-screen pb-10">
 
-    <header class="header-gradient p-6 sticky top-0 z-50">
+    <header class="header-glass sticky top-0 z-50 p-6 shadow-2xl">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-black text-white tracking-tighter uppercase italic">Katy Finance</h1>
+                <h1 class="text-2xl font-black italic tracking-tighter text-white">KATY FINANCE</h1>
                 <div class="flex items-center gap-2">
-                    <span class="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
-                    <p class="text-blue-400 text-[10px] font-bold tracking-[0.2em] uppercase">Sistema Operativo Hogar</p>
+                    <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                    <p class="text-[10px] font-bold text-blue-400 tracking-[0.3em] uppercase">Operations Center</p>
                 </div>
             </div>
-            <div class="bg-blue-600/20 p-3 rounded-lg border border-blue-500/30">
+            <div class="h-12 w-12 rounded-xl bg-blue-900/30 border border-blue-500/50 flex items-center justify-center">
                 <i class="fas fa-microchip text-blue-400 text-xl"></i>
             </div>
         </div>
     </header>
 
-    <main class="p-4 max-w-md mx-auto">
+    <main class="max-w-md mx-auto p-4">
         
         <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="industrial-card p-4 rounded-xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-1 opacity-10"><i class="fas fa-landmark text-4xl"></i></div>
-                <p class="text-blue-400 text-[9px] font-black uppercase mb-1 tracking-widest">Tasa BCV</p>
-                <p id="val-bcv" class="text-2xl font-mono font-bold text-white">---</p>
+            <div class="industrial-border p-5 rounded-2xl relative overflow-hidden group">
+                <div class="absolute -right-2 -top-2 opacity-5 text-4xl group-hover:scale-110 transition-transform"><i class="fas fa-landmark"></i></div>
+                <p class="text-blue-400 text-[9px] font-black uppercase tracking-widest mb-1">Tasa BCV</p>
+                <p id="tasa-bcv" class="text-2xl font-mono-custom font-bold">---</p>
             </div>
-            <div class="industrial-card p-4 rounded-xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-1 opacity-10"><i class="fab fa-bitcoin text-4xl"></i></div>
-                <p class="text-yellow-500 text-[9px] font-black uppercase mb-1 tracking-widest">Tasa Binance</p>
-                <p id="val-binance" class="text-2xl font-mono font-bold text-white">---</p>
+            <div class="industrial-border p-5 rounded-2xl relative overflow-hidden group">
+                <div class="absolute -right-2 -top-2 opacity-5 text-4xl group-hover:scale-110 transition-transform"><i class="fab fa-bitcoin"></i></div>
+                <p class="text-blue-500 text-[9px] font-black uppercase tracking-widest mb-1">Tasa Binance</p>
+                <p id="tasa-binance" class="text-2xl font-mono-custom font-bold">---</p>
             </div>
         </div>
 
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xs font-bold text-slate-500 uppercase tracking-[0.3em]">Gastos Proyectados</h2>
-            <button onclick="cargarDatos()" class="text-blue-500 text-xs hover:rotate-180 transition-all duration-500">
-                <i class="fas fa-sync-alt"></i>
+        <div class="flex items-center justify-between mb-6 px-1">
+            <h2 class="text-xs font-black text-slate-500 uppercase tracking-[0.4em]">Registros Activos</h2>
+            <button onclick="fetchFinanceData()" class="text-blue-500 hover:text-white transition-colors">
+                <i class="fas fa-sync-alt text-sm"></i>
             </button>
         </div>
 
-        <div id="lista-gastos" class="space-y-4">
-            <div class="space-y-4">
-                <div class="shimmer h-24 w-full rounded-xl opacity-20"></div>
-                <div class="shimmer h-24 w-full rounded-xl opacity-20"></div>
-                <p class="text-center text-slate-600 text-[10px] font-bold uppercase mt-4">Sincronizando con Google Sheets...</p>
+        <div id="app-container" class="space-y-4">
+            <div class="py-20 text-center">
+                <span class="loader"></span>
+                <p class="mt-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Sincronizando Cerebro...</p>
             </div>
         </div>
+
     </main>
 
     <script>
-        // PEGA TU URL DE GOOGLE AQUÍ
-        const MI_API_URL = "https://script.google.com/macros/s/AKfycbxOZghPKDZbmwNISyRVl2c6smuMe5WyXYSEbTKWvioE0R9oIXB7GylQIerF1dmz32Nd/exec";
+        // TU URL REAL CONECTADA
+        const API_URL = "https://script.google.com/macros/s/AKfycbxOZghPKDZbmwNISyRVl2c6smuMe5WyXYSEbTKWvioE0R9oIXB7GylQIerF1dmz32Nd/exec";
 
-        async function cargarDatos() {
-            const contenedor = document.getElementById('lista-gastos');
+        async function fetchFinanceData() {
+            const container = document.getElementById('app-container');
             
             try {
-                const response = await fetch(MI_API_URL);
-                if (!response.ok) throw new Error('Respuesta de red no ok');
-                
+                const response = await fetch(API_URL);
                 const data = await response.json();
-                
-                if (data.error) {
-                    contenedor.innerHTML = `<div class="p-4 bg-red-900/20 border border-red-500 text-red-400 text-xs rounded-lg">${data.error}</div>`;
-                    return;
-                }
 
                 if (data.length > 0) {
-                    // Actualizar Tasas
-                    document.getElementById('val-bcv').innerText = data[0].TASA_BCV ? data[0].TASA_BCV + " Bs" : "---";
-                    document.getElementById('val-binance').innerText = data[0].TASA_BINANCE ? data[0].TASA_BINANCE + " Bs" : "---";
+                    // Actualizar Tasas Superiores
+                    document.getElementById('tasa-bcv').innerText = data[0].TASA_BCV ? `${data[0].TASA_BCV} Bs` : "---";
+                    document.getElementById('tasa-binance').innerText = data[0].TASA_BINANCE ? `${data[0].TASA_BINANCE} Bs` : "---";
 
-                    contenedor.innerHTML = ""; // Limpiar carga
+                    container.innerHTML = ""; // Limpiar el loader
 
                     data.forEach(item => {
-                        const esPagado = item.ESTADO === "PAGADO";
-                        const tarjeta = `
-                            <div class="industrial-card p-5 rounded-2xl relative border-r-4 ${esPagado ? 'border-green-500' : 'border-blue-600'}">
+                        const isPaid = item.ESTADO === "PAGADO";
+                        const card = `
+                            <div class="industrial-border p-5 rounded-3xl relative transition-all active:scale-95 border-r-8 ${isPaid ? 'border-green-500' : 'border-blue-600'}">
                                 <div class="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 class="font-bold text-lg text-white tracking-tight">${item.DESCRIPCION}</h3>
-                                        <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest mt-1">
-                                            <i class="fas fa-wallet mr-1 text-[8px]"></i> ${item.BILLETERA || 'POR DEFINIR'}
-                                        </p>
+                                    <div class="max-w-[65%]">
+                                        <h3 class="text-lg font-black text-white leading-tight uppercase tracking-tight">${item.DESCRIPCION}</h3>
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <span class="bg-blue-900/40 text-blue-400 text-[9px] font-bold px-2 py-1 rounded border border-blue-500/20">
+                                                <i class="fas fa-wallet mr-1"></i> ${item.BILLETERA || 'SIN ASIGNAR'}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-xl font-black text-white">$${Number(item.MONTO_REAL_USD || 0).toFixed(2)}</p>
-                                        <p class="text-[10px] text-slate-500 font-mono italic">Bs. ${Number(item.MONTO_BS || 0).toLocaleString()}</p>
+                                        <p class="text-2xl font-black text-white">$${Number(item.MONTO_REAL_USD || 0).toFixed(2)}</p>
+                                        <p class="text-[10px] font-mono-custom text-slate-500 uppercase">Bs. ${Number(item.MONTO_BS || 0).toLocaleString()}</p>
                                     </div>
                                 </div>
                                 
-                                <div class="flex justify-between items-center border-t border-slate-800 pt-3">
-                                    <span class="text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-tighter ${esPagado ? 'bg-green-500/10 text-green-400 border border-green-500/30' : 'bg-blue-500/10 text-blue-400 border border-blue-500/30'}">
+                                <div class="flex justify-between items-center border-t border-slate-700/50 pt-4 mt-2">
+                                    <span class="status-badge ${isPaid ? 'bg-green-900/30 text-green-400 border border-green-500/30' : 'bg-red-900/30 text-red-400 border border-red-500/30'}">
                                         ${item.ESTADO || 'PENDIENTE'}
                                     </span>
-                                    <p class="text-[9px] text-slate-600 font-bold uppercase tracking-tighter">Base: $${item.MONTO_USD || '0'}</p>
+                                    <p class="text-[9px] font-bold text-slate-600 uppercase">Presupuesto Base: $${item.MONTO_USD || '0'}</p>
                                 </div>
                             </div>
                         `;
-                        contenedor.innerHTML += tarjeta;
+                        container.innerHTML += card;
                     });
                 } else {
-                    contenedor.innerHTML = `<p class="text-center text-slate-500 text-xs">La hoja GASTOS está vacía.</p>`;
+                    container.innerHTML = `
+                        <div class="industrial-border p-10 rounded-3xl text-center">
+                            <i class="fas fa-folder-open text-slate-700 text-4xl mb-4"></i>
+                            <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">No hay datos en GASTOS</p>
+                            <p class="text-[10px] text-slate-600 mt-2">Agrega una fila en tu Google Sheet para empezar.</p>
+                        </div>
+                    `;
                 }
-
             } catch (error) {
-                console.error("Error:", error);
-                contenedor.innerHTML = `
-                    <div class="bg-red-900/20 p-6 rounded-2xl border border-red-800 text-center">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-xl mb-2"></i>
-                        <p class="text-red-400 text-[10px] font-black uppercase tracking-widest">Error de Sincronización</p>
-                        <p class="text-[9px] text-slate-500 mt-2 italic">Asegúrate de que la URL de Google Apps Script termine en /exec y que la implementación sea pública.</p>
+                container.innerHTML = `
+                    <div class="bg-red-900/20 border border-red-800 p-8 rounded-3xl text-center">
+                        <i class="fas fa-triangle-exclamation text-red-500 text-3xl mb-4"></i>
+                        <p class="text-red-400 text-xs font-black uppercase tracking-widest">Falla de Enlace</p>
+                        <p class="text-[10px] text-slate-500 mt-2 italic">Revisa los permisos de la App Web en Google Apps Script.</p>
                     </div>
                 `;
             }
         }
 
-        // Ejecutar carga al abrir
-        cargarDatos();
+        // Carga inicial
+        fetchFinanceData();
     </script>
 </body>
 </html>
