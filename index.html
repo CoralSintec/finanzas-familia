@@ -2,184 +2,264 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katy Home Finance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Katy Home App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap');
-        
-        :root {
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --blue-accent: #2563eb;
-            --blue-deep: #1e3a8a;
-        }
-
-        body { 
-            background-color: var(--bg-dark); 
-            font-family: 'Inter', sans-serif;
-            color: #f1f5f9;
-        }
-
-        .industrial-border {
-            border: 1px solid #334155;
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-        }
-
-        .header-glass {
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid var(--blue-accent);
-        }
-
+        :root { --bg-dark: #0f172a; --blue-accent: #2563eb; }
+        body { background-color: var(--bg-dark); font-family: 'Inter', sans-serif; color: #f1f5f9; padding-bottom: 80px; }
+        .industrial-border { border: 1px solid #334155; background: linear-gradient(145deg, #1e293b, #0f172a); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .header-glass { background: rgba(15, 23, 42, 0.95); border-bottom: 2px solid var(--blue-accent); }
+        .bottom-nav { background: rgba(15, 23, 42, 0.95); border-top: 1px solid #334155; backdrop-filter: blur(10px); }
+        .nav-item.active { color: var(--blue-accent); border-top: 2px solid var(--blue-accent); background: rgba(37, 99, 235, 0.1); }
         .font-mono-custom { font-family: 'JetBrains Mono', monospace; }
-        
-        .status-badge {
-            font-size: 10px;
-            font-weight: 900;
-            padding: 4px 10px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Animación de carga */
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #1e3a8a;
-            border-bottom-color: #2563eb;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        /* Loader */
+        .loader { width: 40px; height: 40px; border: 4px solid #1e3a8a; border-bottom-color: #2563eb; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Modal */
+        .modal { display: none; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
     </style>
 </head>
-<body class="min-h-screen pb-10">
+<body>
 
-    <header class="header-glass sticky top-0 z-50 p-6 shadow-2xl">
-        <div class="max-w-md mx-auto flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-black italic tracking-tighter text-white">KATY FINANCE</h1>
-                <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                    <p class="text-[10px] font-bold text-blue-400 tracking-[0.3em] uppercase">Operations Center</p>
-                </div>
-            </div>
-            <div class="h-12 w-12 rounded-xl bg-blue-900/30 border border-blue-500/50 flex items-center justify-center">
-                <i class="fas fa-microchip text-blue-400 text-xl"></i>
-            </div>
+    <header class="header-glass sticky top-0 z-40 p-5 shadow-2xl flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-black italic tracking-tighter text-white">KATY FINANCE</h1>
+            <p class="text-[9px] font-bold text-blue-400 tracking-[0.2em] uppercase">Control Central</p>
         </div>
+        <button onclick="sincronizar()" class="h-10 w-10 rounded-xl bg-blue-900/30 border border-blue-500/50 flex items-center justify-center text-blue-400 hover:bg-blue-600 hover:text-white transition-all">
+            <i class="fas fa-sync-alt"></i>
+        </button>
     </header>
 
-    <main class="max-w-md mx-auto p-4">
-        
-        <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="industrial-border p-5 rounded-2xl relative overflow-hidden group">
-                <div class="absolute -right-2 -top-2 opacity-5 text-4xl group-hover:scale-110 transition-transform"><i class="fas fa-landmark"></i></div>
-                <p class="text-blue-400 text-[9px] font-black uppercase tracking-widest mb-1">Tasa BCV</p>
-                <p id="tasa-bcv" class="text-2xl font-mono-custom font-bold">---</p>
-            </div>
-            <div class="industrial-border p-5 rounded-2xl relative overflow-hidden group">
-                <div class="absolute -right-2 -top-2 opacity-5 text-4xl group-hover:scale-110 transition-transform"><i class="fab fa-bitcoin"></i></div>
-                <p class="text-blue-500 text-[9px] font-black uppercase tracking-widest mb-1">Tasa Binance</p>
-                <p id="tasa-binance" class="text-2xl font-mono-custom font-bold">---</p>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-between mb-6 px-1">
-            <h2 class="text-xs font-black text-slate-500 uppercase tracking-[0.4em]">Registros Activos</h2>
-            <button onclick="fetchFinanceData()" class="text-blue-500 hover:text-white transition-colors">
-                <i class="fas fa-sync-alt text-sm"></i>
-            </button>
-        </div>
-
-        <div id="app-container" class="space-y-4">
-            <div class="py-20 text-center">
-                <span class="loader"></span>
-                <p class="mt-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Sincronizando Cerebro...</p>
-            </div>
-        </div>
-
+    <main class="max-w-md mx-auto p-4" id="main-content">
+        <div class="py-20 text-center"><span class="loader"></span><p class="mt-4 text-[10px] font-black text-slate-500 uppercase">Cargando Sistema...</p></div>
     </main>
 
-    <script>
-        // TU URL REAL CONECTADA
-        const API_URL = "https://script.google.com/macros/s/AKfycbxOZghPKDZbmwNISyRVl2c6smuMe5WyXYSEbTKWvioE0R9oIXB7GylQIerF1dmz32Nd/exec";
+    <nav class="bottom-nav fixed bottom-0 w-full z-40 flex justify-around items-center h-16 max-w-md left-1/2 -translate-x-1/2">
+        <button onclick="cambiarVista('gastos')" id="nav-gastos" class="nav-item active flex-1 h-full flex flex-col items-center justify-center text-slate-500 transition-all">
+            <i class="fas fa-file-invoice-dollar text-xl mb-1"></i>
+            <span class="text-[9px] font-bold uppercase tracking-widest">Gastos</span>
+        </button>
+        <button onclick="cambiarVista('ingresos')" id="nav-ingresos" class="nav-item flex-1 h-full flex flex-col items-center justify-center text-slate-500 transition-all">
+            <i class="fas fa-hand-holding-dollar text-xl mb-1"></i>
+            <span class="text-[9px] font-bold uppercase tracking-widest">Ingresos</span>
+        </button>
+        <button onclick="cambiarVista('saldos')" id="nav-saldos" class="nav-item flex-1 h-full flex flex-col items-center justify-center text-slate-500 transition-all">
+            <i class="fas fa-wallet text-xl mb-1"></i>
+            <span class="text-[9px] font-bold uppercase tracking-widest">Saldos</span>
+        </button>
+    </nav>
 
-        async function fetchFinanceData() {
-            const container = document.getElementById('app-container');
-            
+    <div id="modal-gasto" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+        <div class="industrial-border w-full max-w-sm rounded-2xl p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-black uppercase text-white">Nuevo Gasto</h2>
+                <button onclick="cerrarModales()" class="text-slate-400 text-xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-3">
+                <input type="text" id="g-desc" placeholder="Descripción (Ej. Mercado)" class="w-full bg-slate-800 border border-slate-600 text-white p-3 rounded-lg text-sm">
+                <input type="number" id="g-monto" placeholder="Monto Base ($)" class="w-full bg-slate-800 border border-slate-600 text-white p-3 rounded-lg text-sm">
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="number" id="g-bcv" placeholder="Tasa BCV" class="w-full bg-slate-800 border border-slate-600 text-white p-3 rounded-lg text-sm">
+                    <input type="number" id="g-binance" placeholder="Tasa Binance" class="w-full bg-slate-800 border border-slate-600 text-white p-3 rounded-lg text-sm">
+                </div>
+                <select id="g-billetera" class="w-full bg-slate-800 border border-slate-600 text-white p-3 rounded-lg text-sm uppercase">
+                    <option value="Facebank">Facebank</option><option value="Binance">Binance</option>
+                    <option value="Zinli">Zinli</option><option value="Efectivo">Efectivo</option>
+                </select>
+                <button onclick="guardarGasto()" id="btn-guardar-gasto" class="w-full bg-blue-600 text-white font-black uppercase tracking-widest p-3 rounded-lg mt-2 shadow-lg shadow-blue-900/50">Guardar Gasto</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-ingreso" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+        <div class="industrial-border w-full max-w-sm rounded-2xl p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-black uppercase text-green-400">Nuevo Ingreso</h2>
+                <button onclick="cerrarModales()" class="text-slate-400 text-xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-3">
+                <input type="date" id="i-fecha" class="w-full bg-slate-800 border border-slate-600 text-white p-3 rounded-lg text-sm">
+                <input type="text" id="i-desc" placeholder="Origen (Ej. Pago Cliente X)" class="w-full bg-slate-800 border border-slate-600 text-white p-3 rounded-lg text-sm">
+                <input type="number" id="i-monto" placeholder="Monto Ingresado ($)" class="w-full bg-slate-800 border border-slate-600 text-white p-3 rounded-lg text-sm">
+                <select id="i-billetera" class="w-full bg-slate-800 border border-slate-600 text-white p-3 rounded-lg text-sm uppercase">
+                    <option value="Facebank">Facebank</option><option value="Binance">Binance</option>
+                    <option value="Zinli">Zinli</option><option value="Efectivo">Efectivo</option>
+                </select>
+                <button onclick="guardarIngreso()" id="btn-guardar-ingreso" class="w-full bg-green-600 text-white font-black uppercase tracking-widest p-3 rounded-lg mt-2 shadow-lg shadow-green-900/50">Registrar Ingreso</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AQUÍ ESTÁ TU URL ORIGINAL.
+        const API_URL = "https://script.google.com/macros/s/AKfycbxOZghPKDZbmwNISyRVl2c6smuMe5WyXYSEbTKWvioE0R9oIXB7GylQIerF1dmz32Nd/exec";
+        
+        let datosLocales = { gastos: [], ingresos: [], saldos: [] };
+        let vistaActual = 'gastos';
+
+        async function sincronizar() {
+            document.getElementById('main-content').innerHTML = '<div class="py-20 text-center"><span class="loader"></span><p class="mt-4 text-[10px] font-black text-slate-500 uppercase">Sincronizando con Servidor...</p></div>';
             try {
                 const response = await fetch(API_URL);
-                const data = await response.json();
-
-                if (data.length > 0) {
-                    // Actualizar Tasas Superiores
-                    document.getElementById('tasa-bcv').innerText = data[0].TASA_BCV ? `${data[0].TASA_BCV} Bs` : "---";
-                    document.getElementById('tasa-binance').innerText = data[0].TASA_BINANCE ? `${data[0].TASA_BINANCE} Bs` : "---";
-
-                    container.innerHTML = ""; // Limpiar el loader
-
-                    data.forEach(item => {
-                        const isPaid = item.ESTADO === "PAGADO";
-                        const card = `
-                            <div class="industrial-border p-5 rounded-3xl relative transition-all active:scale-95 border-r-8 ${isPaid ? 'border-green-500' : 'border-blue-600'}">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div class="max-w-[65%]">
-                                        <h3 class="text-lg font-black text-white leading-tight uppercase tracking-tight">${item.DESCRIPCION}</h3>
-                                        <div class="flex items-center gap-2 mt-2">
-                                            <span class="bg-blue-900/40 text-blue-400 text-[9px] font-bold px-2 py-1 rounded border border-blue-500/20">
-                                                <i class="fas fa-wallet mr-1"></i> ${item.BILLETERA || 'SIN ASIGNAR'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-2xl font-black text-white">$${Number(item.MONTO_REAL_USD || 0).toFixed(2)}</p>
-                                        <p class="text-[10px] font-mono-custom text-slate-500 uppercase">Bs. ${Number(item.MONTO_BS || 0).toLocaleString()}</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex justify-between items-center border-t border-slate-700/50 pt-4 mt-2">
-                                    <span class="status-badge ${isPaid ? 'bg-green-900/30 text-green-400 border border-green-500/30' : 'bg-red-900/30 text-red-400 border border-red-500/30'}">
-                                        ${item.ESTADO || 'PENDIENTE'}
-                                    </span>
-                                    <p class="text-[9px] font-bold text-slate-600 uppercase">Presupuesto Base: $${item.MONTO_USD || '0'}</p>
-                                </div>
-                            </div>
-                        `;
-                        container.innerHTML += card;
-                    });
-                } else {
-                    container.innerHTML = `
-                        <div class="industrial-border p-10 rounded-3xl text-center">
-                            <i class="fas fa-folder-open text-slate-700 text-4xl mb-4"></i>
-                            <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">No hay datos en GASTOS</p>
-                            <p class="text-[10px] text-slate-600 mt-2">Agrega una fila en tu Google Sheet para empezar.</p>
-                        </div>
-                    `;
+                datosLocales = await response.json();
+                
+                // Pre-llenar tasas si hay gastos
+                if (datosLocales.gastos.length > 0) {
+                    document.getElementById('g-bcv').value = datosLocales.gastos[0].TASA_BCV || 36.5;
+                    document.getElementById('g-binance').value = datosLocales.gastos[0].TASA_BINANCE || 39.1;
                 }
+                
+                renderizarVista();
             } catch (error) {
-                container.innerHTML = `
-                    <div class="bg-red-900/20 border border-red-800 p-8 rounded-3xl text-center">
-                        <i class="fas fa-triangle-exclamation text-red-500 text-3xl mb-4"></i>
-                        <p class="text-red-400 text-xs font-black uppercase tracking-widest">Falla de Enlace</p>
-                        <p class="text-[10px] text-slate-500 mt-2 italic">Revisa los permisos de la App Web en Google Apps Script.</p>
-                    </div>
-                `;
+                document.getElementById('main-content').innerHTML = `<div class="p-6 text-center text-red-400">Error de conexión. Intenta de nuevo.</div>`;
             }
         }
 
-        // Carga inicial
-        fetchFinanceData();
+        function cambiarVista(vista) {
+            vistaActual = vista;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${vista}`).classList.add('active');
+            renderizarVista();
+        }
+
+        function renderizarVista() {
+            const container = document.getElementById('main-content');
+            let html = '';
+
+            if (vistaActual === 'gastos') {
+                html += `
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">Pagos Pendientes</h2>
+                        <button onclick="abrirModal('modal-gasto')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-blue-500/30 uppercase"><i class="fas fa-plus mr-1"></i> Agregar</button>
+                    </div>
+                `;
+                datosLocales.gastos.forEach(g => {
+                    html += `
+                        <div class="industrial-border p-4 rounded-xl mb-3 relative border-l-4 border-blue-500">
+                            <button onclick="eliminarGasto('${g.ID}')" class="absolute top-2 right-3 text-red-500/50 hover:text-red-500 text-sm"><i class="fas fa-trash"></i></button>
+                            <h3 class="font-bold text-white text-base pr-6">${g.DESCRIPCION}</h3>
+                            <p class="text-[9px] text-blue-400 uppercase font-black tracking-widest mt-1"><i class="fas fa-wallet mr-1"></i>${g.BILLETERA}</p>
+                            <div class="flex justify-between items-end mt-3">
+                                <div>
+                                    <p class="text-xl font-black text-white">$${Number(g.MONTO_REAL_USD).toFixed(2)}</p>
+                                    <p class="text-[10px] text-slate-500 font-mono">Bs. ${Number(g.MONTO_BS).toLocaleString()}</p>
+                                </div>
+                                <span class="bg-blue-900/30 text-blue-400 border border-blue-500/30 text-[9px] font-black px-2 py-1 rounded uppercase">${g.ESTADO}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            } 
+            else if (vistaActual === 'ingresos') {
+                html += `
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">Dinero Entrante</h2>
+                        <button onclick="abrirModal('modal-ingreso'); document.getElementById('i-fecha').valueAsDate = new Date();" class="bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-green-500/30 uppercase"><i class="fas fa-plus mr-1"></i> Registrar</button>
+                    </div>
+                `;
+                datosLocales.ingresos.forEach(i => {
+                    let fecha = new Date(i.FECHA).toLocaleDateString('es-ES');
+                    html += `
+                        <div class="industrial-border p-4 rounded-xl mb-3 border-l-4 border-green-500">
+                            <p class="text-[10px] text-slate-400 mb-1">${fecha}</p>
+                            <h3 class="font-bold text-white text-base">${i.DESCRIPCION}</h3>
+                            <div class="flex justify-between items-end mt-2">
+                                <p class="text-[10px] text-green-400 uppercase font-black tracking-widest"><i class="fas fa-wallet mr-1"></i>${i.BILLETERA}</p>
+                                <p class="text-xl font-black text-green-400">+$${Number(i.MONTO_USD).toFixed(2)}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            else if (vistaActual === 'saldos') {
+                html += `<h2 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4 text-center">Liquidez Total</h2>`;
+                let totalSaldos = 0;
+                datosLocales.saldos.forEach(s => {
+                    totalSaldos += Number(s.SALDO_USD);
+                    html += `
+                        <div class="industrial-border p-5 rounded-2xl mb-3 flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-600"><i class="fas fa-university text-blue-400"></i></div>
+                                <h3 class="font-black text-white uppercase tracking-wider">${s.BILLETERA}</h3>
+                            </div>
+                            <p class="text-xl font-mono-custom font-bold text-white">$${Number(s.SALDO_USD).toFixed(2)}</p>
+                        </div>
+                    `;
+                });
+                html = `
+                    <div class="industrial-border p-6 rounded-2xl mb-6 text-center bg-gradient-to-br from-blue-900/50 to-slate-900 border-t-4 border-blue-500">
+                        <p class="text-[10px] text-blue-300 font-bold uppercase tracking-[0.3em] mb-2">Fondo Total Disponible</p>
+                        <p class="text-4xl font-black text-white">$${totalSaldos.toFixed(2)}</p>
+                    </div>
+                ` + html;
+            }
+
+            if (html === '') html = `<div class="text-center py-10 text-slate-500 text-sm">No hay registros</div>`;
+            container.innerHTML = html;
+        }
+
+        // FUNCIONES DE INTERFAZ Y COMUNICACIÓN
+        function abrirModal(id) { document.getElementById(id).classList.add('active'); }
+        function cerrarModales() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
+
+        async function guardarGasto() {
+            const btn = document.getElementById('btn-guardar-gasto');
+            const desc = document.getElementById('g-desc').value;
+            const monto = parseFloat(document.getElementById('g-monto').value);
+            const bcv = parseFloat(document.getElementById('g-bcv').value);
+            const binance = parseFloat(document.getElementById('g-binance').value);
+            const billetera = document.getElementById('g-billetera').value;
+
+            if(!desc || !monto || !bcv || !binance) return alert("Llena todos los campos");
+
+            btn.innerText = "Guardando..."; btn.disabled = true;
+            
+            const montoBs = monto * bcv;
+            const montoReal = montoBs / binance;
+
+            const payload = { accion: "agregarGasto", descripcion: desc, montoUSD: monto, tasaBCV: bcv, montoBS: montoBs, tasaBinance: binance, montoReal: montoReal, billetera: billetera };
+
+            await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+            
+            btn.innerText = "Guardar Gasto"; btn.disabled = false;
+            cerrarModales();
+            sincronizar();
+        }
+
+        async function eliminarGasto(id) {
+            if(!confirm("¿Seguro que quieres eliminar este pago?")) return;
+            document.getElementById('main-content').innerHTML = '<div class="py-20 text-center"><span class="loader"></span><p class="mt-4 text-[10px] text-red-400 font-black uppercase">Eliminando...</p></div>';
+            await fetch(API_URL, { method: "POST", body: JSON.stringify({ accion: "eliminarGasto", id: id }) });
+            sincronizar();
+        }
+
+        async function guardarIngreso() {
+            const btn = document.getElementById('btn-guardar-ingreso');
+            const fecha = document.getElementById('i-fecha').value;
+            const desc = document.getElementById('i-desc').value;
+            const monto = parseFloat(document.getElementById('i-monto').value);
+            const billetera = document.getElementById('i-billetera').value;
+
+            if(!fecha || !desc || !monto) return alert("Llena todos los campos");
+
+            btn.innerText = "Registrando..."; btn.disabled = true;
+
+            const payload = { accion: "agregarIngreso", fecha: fecha, descripcion: desc, montoUSD: monto, billetera: billetera };
+
+            await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+            
+            btn.innerText = "Registrar Ingreso"; btn.disabled = false;
+            cerrarModales();
+            sincronizar();
+        }
+
+        // Iniciar
+        sincronizar();
     </script>
 </body>
 </html>
