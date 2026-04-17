@@ -18,18 +18,39 @@
         .modal.active { display: flex; }
         .loader { width: 40px; height: 40px; border: 4px solid #1e3a8a; border-bottom-color: #2563eb; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .font-mono-custom { font-family: 'JetBrains Mono', monospace; }
     </style>
 </head>
 <body>
 
-    <header class="header-glass sticky top-0 z-40 p-5 flex justify-between items-center shadow-xl">
-        <div>
-            <h1 class="text-xl font-black italic tracking-tighter text-white">KATY FINANCE</h1>
-            <p id="label-vista" class="text-[9px] font-bold text-blue-400 tracking-[0.3em] uppercase">Control de Gastos</p>
+    <header class="header-glass sticky top-0 z-40 p-5 shadow-xl">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h1 class="text-xl font-black italic tracking-tighter text-white">KATY FINANCE</h1>
+                <p id="label-vista" class="text-[9px] font-bold text-blue-400 tracking-[0.3em] uppercase">Control de Gastos</p>
+            </div>
+            <button onclick="sincronizarTodo()" class="h-10 w-10 rounded-xl bg-blue-900/30 border border-blue-500/50 flex items-center justify-center text-blue-400 hover:bg-blue-600 hover:text-white transition-all active:scale-95">
+                <i class="fas fa-sync-alt" id="icon-sync"></i>
+            </button>
         </div>
-        <button onclick="sincronizar()" class="h-10 w-10 rounded-xl bg-blue-900/30 border border-blue-500/50 flex items-center justify-center text-blue-400">
-            <i class="fas fa-sync-alt"></i>
-        </button>
+
+        <div class="grid grid-cols-3 gap-2">
+            <div class="industrial-card p-3 rounded-xl text-center border-t-2 border-blue-500 relative overflow-hidden">
+                <div class="absolute -right-1 -top-1 opacity-5 text-2xl"><i class="fas fa-landmark"></i></div>
+                <p class="text-[8px] text-blue-400 font-black uppercase mb-1 tracking-widest">USD BCV</p>
+                <p class="text-sm font-mono-custom font-bold text-white"><span id="tasa-bcv">...</span></p>
+            </div>
+            <div class="industrial-card p-3 rounded-xl text-center border-t-2 border-yellow-500 relative overflow-hidden">
+                <div class="absolute -right-1 -top-1 opacity-5 text-2xl"><i class="fab fa-bitcoin"></i></div>
+                <p class="text-[8px] text-yellow-500 font-black uppercase mb-1 tracking-widest">Binance</p>
+                <p class="text-sm font-mono-custom font-bold text-white"><span id="tasa-binance">...</span></p>
+            </div>
+            <div class="industrial-card p-3 rounded-xl text-center border-t-2 border-indigo-400 relative overflow-hidden">
+                <div class="absolute -right-1 -top-1 opacity-5 text-2xl"><i class="fas fa-euro-sign"></i></div>
+                <p class="text-[8px] text-indigo-400 font-black uppercase mb-1 tracking-widest">EUR BCV</p>
+                <p class="text-sm font-mono-custom font-bold text-white"><span id="tasa-euro">...</span></p>
+            </div>
+        </div>
     </header>
 
     <main class="max-w-md mx-auto p-4" id="main-content">
@@ -39,15 +60,15 @@
     <nav class="bottom-nav fixed bottom-0 w-full z-40 flex justify-around h-20 max-w-md left-1/2 -translate-x-1/2">
         <button onclick="cambiarVista('gastos')" id="nav-gastos" class="nav-item active flex-1 flex flex-col items-center justify-center text-slate-500">
             <i class="fas fa-file-invoice-dollar text-xl mb-1"></i>
-            <span class="text-[8px] font-bold uppercase">Gastos</span>
+            <span class="text-[8px] font-bold uppercase tracking-widest">Gastos</span>
         </button>
         <button onclick="cambiarVista('ingresos')" id="nav-ingresos" class="nav-item flex-1 flex flex-col items-center justify-center text-slate-500">
             <i class="fas fa-hand-holding-dollar text-xl mb-1"></i>
-            <span class="text-[8px] font-bold uppercase">Ingresos</span>
+            <span class="text-[8px] font-bold uppercase tracking-widest">Ingresos</span>
         </button>
         <button onclick="cambiarVista('saldos')" id="nav-saldos" class="nav-item flex-1 flex flex-col items-center justify-center text-slate-500">
             <i class="fas fa-wallet text-xl mb-1"></i>
-            <span class="text-[8px] font-bold uppercase">Saldos</span>
+            <span class="text-[8px] font-bold uppercase tracking-widest">Saldos</span>
         </button>
     </nav>
 
@@ -55,17 +76,14 @@
         <div class="industrial-card w-full max-w-sm rounded-3xl p-6 border-t-4 border-blue-500">
             <h2 id="pago-titulo" class="text-lg font-black uppercase text-white mb-1">Procesar Pago</h2>
             <p id="pago-subtitulo" class="text-xs text-slate-400 mb-6 font-bold uppercase tracking-widest italic"></p>
-            
             <div class="space-y-4">
                 <div>
                     <label class="text-[10px] font-black text-blue-400 uppercase mb-2 block">Monto a abonar ($)</label>
                     <input type="number" id="p-monto-abono" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl text-xl font-bold focus:border-blue-500 outline-none">
                 </div>
-                
-                <button onclick="marcarPagoTotal()" class="w-full py-2 bg-blue-900/30 border border-blue-500/50 text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
+                <button onclick="marcarPagoTotal()" class="w-full py-3 bg-blue-900/30 border border-blue-500/50 text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
                     <i class="fas fa-check-double mr-2"></i> Seleccionar Pago Total
                 </button>
-
                 <div class="flex gap-3 pt-4">
                     <button onclick="cerrarModales()" class="flex-1 py-4 bg-slate-800 text-slate-400 rounded-xl font-bold uppercase text-xs">Cancelar</button>
                     <button onclick="confirmarPago()" id="btn-confirmar-pago" class="flex-1 py-4 bg-blue-600 text-white rounded-xl font-black uppercase text-xs shadow-lg shadow-blue-900/40">Confirmar</button>
@@ -75,20 +93,47 @@
     </div>
 
     <div id="modal-gasto" class="modal fixed inset-0 z-50 items-center justify-center p-4">
-        <div class="industrial-card w-full max-w-sm rounded-3xl p-6 border-t-4 border-blue-500">
+        <div class="industrial-card w-full max-w-sm rounded-3xl p-6 border-t-4 border-blue-500 max-h-[90vh] overflow-y-auto">
             <h2 class="text-lg font-black uppercase text-white mb-6">Nuevo Gasto</h2>
             <div class="space-y-4">
-                <input type="text" id="g-desc" placeholder="Descripción" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl">
-                <input type="number" id="g-monto" placeholder="Monto Base ($)" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="number" id="g-bcv" placeholder="BCV" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl">
-                    <input type="number" id="g-binance" placeholder="Binance" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl">
+                <input type="text" id="g-desc" placeholder="Descripción (Ej. Mercado)" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl text-sm">
+                <input type="number" id="g-monto" placeholder="Monto Base ($)" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl text-sm">
+                
+                <div class="p-3 bg-blue-900/20 border border-blue-500/30 rounded-xl">
+                    <p class="text-[9px] text-blue-400 font-bold uppercase tracking-widest mb-2"><i class="fas fa-bolt mr-1"></i> Tasas en Tiempo Real</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[8px] text-slate-500 uppercase font-black">BCV</label>
+                            <input type="number" id="g-bcv" class="w-full bg-slate-900 border border-slate-700 text-blue-300 p-3 rounded-lg text-xs font-mono-custom">
+                        </div>
+                        <div>
+                            <label class="text-[8px] text-slate-500 uppercase font-black">Binance</label>
+                            <input type="number" id="g-binance" class="w-full bg-slate-900 border border-slate-700 text-yellow-500 p-3 rounded-lg text-xs font-mono-custom">
+                        </div>
+                    </div>
                 </div>
+
                 <select id="g-billetera" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl uppercase font-bold text-sm">
                     <option value="Facebank">Facebank</option><option value="Binance">Binance</option><option value="Zinli">Zinli</option><option value="Efectivo">Efectivo</option>
                 </select>
                 <button onclick="guardarGasto()" id="btn-guardar-gasto" class="w-full bg-blue-600 py-4 rounded-xl font-black uppercase shadow-lg shadow-blue-900/40">Crear Gasto</button>
-                <button onclick="cerrarModales()" class="w-full py-2 text-slate-500 text-[10px] font-bold uppercase tracking-widest">Cerrar</button>
+                <button onclick="cerrarModales()" class="w-full py-2 text-slate-500 text-[10px] font-bold uppercase tracking-widest">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-ingreso" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+        <div class="industrial-card w-full max-w-sm rounded-3xl p-6 border-t-4 border-green-500">
+            <h2 class="text-lg font-black uppercase text-green-400 mb-6">Nuevo Ingreso</h2>
+            <div class="space-y-4">
+                <input type="date" id="i-fecha" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl text-sm">
+                <input type="text" id="i-desc" placeholder="Origen (Ej. Pago Cliente)" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl text-sm">
+                <input type="number" id="i-monto" placeholder="Monto Ingresado ($)" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl text-sm">
+                <select id="i-billetera" class="w-full bg-slate-800 border border-slate-600 text-white p-4 rounded-xl uppercase font-bold text-sm">
+                    <option value="Facebank">Facebank</option><option value="Binance">Binance</option><option value="Zinli">Zinli</option><option value="Efectivo">Efectivo</option>
+                </select>
+                <button onclick="guardarIngreso()" id="btn-guardar-ingreso" class="w-full bg-green-600 py-4 rounded-xl font-black text-white uppercase shadow-lg shadow-green-900/40">Registrar Ingreso</button>
+                <button onclick="cerrarModales()" class="w-full py-2 text-slate-500 text-[10px] font-bold uppercase tracking-widest">Cancelar</button>
             </div>
         </div>
     </div>
@@ -96,16 +141,64 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxOZghPKDZbmwNISyRVl2c6smuMe5WyXYSEbTKWvioE0R9oIXB7GylQIerF1dmz32Nd/exec";
         let datosLocales = { gastos: [], ingresos: [], saldos: [] };
+        let tasasVivas = { bcv: 0, binance: 0, euro: 0 };
         let vistaActual = 'gastos';
         let gastoSeleccionado = null;
 
-        async function sincronizar() {
-            document.getElementById('main-content').innerHTML = '<div class="py-20 text-center"><span class="loader"></span></div>';
+        // FUNCIÓN MÁGICA PARA OBTENER TASAS EN TIEMPO REAL
+        async function obtenerTasasReales() {
+            try {
+                // Obtenemos USD Oficial y Binance
+                const resDolar = await fetch('https://ve.dolarapi.com/v1/dolares');
+                const dataDolar = await resDolar.json();
+                
+                const bcvData = dataDolar.find(d => d.fuente === 'oficial');
+                const binanceData = dataDolar.find(d => d.fuente === 'binance');
+                
+                if(bcvData) tasasVivas.bcv = bcvData.promedio;
+                if(binanceData) tasasVivas.binance = binanceData.promedio;
+
+                // Obtenemos EURO Oficial
+                const resEuro = await fetch('https://ve.dolarapi.com/v1/euros');
+                const dataEuro = await resEuro.json();
+                const euroData = dataEuro.find(e => e.fuente === 'oficial');
+                if(euroData) tasasVivas.euro = euroData.promedio;
+
+                // Actualizamos la pantalla
+                document.getElementById('tasa-bcv').innerText = tasasVivas.bcv ? tasasVivas.bcv.toFixed(2) : '---';
+                document.getElementById('tasa-binance').innerText = tasasVivas.binance ? tasasVivas.binance.toFixed(2) : '---';
+                document.getElementById('tasa-euro').innerText = tasasVivas.euro ? tasasVivas.euro.toFixed(2) : '---';
+
+                // Llenamos automáticamente el formulario de Nuevo Gasto
+                document.getElementById('g-bcv').value = tasasVivas.bcv;
+                document.getElementById('g-binance').value = tasasVivas.binance;
+
+            } catch (error) {
+                console.log("Error cargando tasas de internet, usando respaldo.");
+                document.getElementById('tasa-bcv').innerText = "ERR";
+                document.getElementById('tasa-binance').innerText = "ERR";
+                document.getElementById('tasa-euro').innerText = "ERR";
+            }
+        }
+
+        async function sincronizarTodo() {
+            const icon = document.getElementById('icon-sync');
+            icon.classList.add('animate-spin'); // Hacer girar el icono
+            document.getElementById('main-content').innerHTML = '<div class="py-20 text-center"><span class="loader"></span><p class="text-[10px] text-slate-500 font-bold uppercase mt-4">Actualizando Sistema...</p></div>';
+            
+            // 1. Buscar las Tasas en internet
+            await obtenerTasasReales();
+
+            // 2. Buscar los datos en tu Google Sheets
             try {
                 const response = await fetch(API_URL);
                 datosLocales = await response.json();
                 renderizarVista();
-            } catch (e) { alert("Error de conexión"); }
+            } catch (e) { 
+                alert("Error de conexión con Google Sheets"); 
+            } finally {
+                icon.classList.remove('animate-spin');
+            }
         }
 
         function cambiarVista(v) {
@@ -131,35 +224,42 @@
                     html += `
                         <div class="industrial-card p-5 rounded-3xl mb-4 border-l-4 ${esPagado ? 'border-green-500' : 'border-blue-600'}">
                             <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-black text-white leading-tight uppercase tracking-tight">${g.DESCRIPCION}</h3>
-                                <button onclick="eliminarGasto('${g.ID}')" class="text-slate-600 hover:text-red-500"><i class="fas fa-trash-alt text-xs"></i></button>
+                                <h3 class="font-black text-white leading-tight uppercase tracking-tight pr-6">${g.DESCRIPCION}</h3>
+                                <button onclick="eliminarGasto('${g.ID}')" class="text-slate-600 hover:text-red-500 absolute top-5 right-5"><i class="fas fa-trash-alt text-sm"></i></button>
                             </div>
-                            <div class="flex justify-between items-end mb-4">
+                            <div class="flex justify-between items-end mb-4 mt-2">
                                 <div>
                                     <p class="text-2xl font-black text-white">$${req.toFixed(2)}</p>
                                     <p class="text-[9px] font-bold text-blue-400 uppercase tracking-widest"><i class="fas fa-wallet mr-1"></i>${g.BILLETERA}</p>
                                 </div>
-                                <button onclick="prepararPago(${JSON.stringify(g).replace(/"/g, '&quot;')})" class="px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-tighter shadow-md ${esPagado ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
+                                <button onclick="prepararPago(${JSON.stringify(g).replace(/"/g, '&quot;')})" class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-tighter shadow-md ${esPagado ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
                                     ${esPagado ? 'Pagado' : abo > 0 ? 'Abonado $' + abo.toFixed(2) : 'Pendiente'}
                                 </button>
                             </div>
-                            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-3">
                                 <div class="h-full ${esPagado ? 'bg-green-500' : 'bg-blue-500'} transition-all" style="width: ${pct}%"></div>
                             </div>
                         </div>`;
+                });
+            } else if (vistaActual === 'ingresos') {
+                html += `<div class="flex justify-between items-center mb-6"><h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Registros</h2><button onclick="abrirModal('modal-ingreso'); document.getElementById('i-fecha').valueAsDate = new Date();" class="bg-green-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase shadow-lg shadow-green-900/30">Registrar</button></div>`;
+                datosLocales.ingresos.forEach(i => {
+                    let fecha = new Date(i.FECHA).toLocaleDateString('es-ES');
+                    html += `<div class="industrial-card p-4 rounded-2xl mb-3 border-l-4 border-green-500"><p class="text-[10px] text-slate-400 mb-1">${fecha}</p><h3 class="font-bold text-white text-base">${i.DESCRIPCION}</h3><div class="flex justify-between items-end mt-2"><p class="text-[10px] text-green-400 uppercase font-black tracking-widest"><i class="fas fa-wallet mr-1"></i>${i.BILLETERA}</p><p class="text-xl font-black text-green-400">+$${Number(i.MONTO_USD).toFixed(2)}</p></div></div>`;
                 });
             } else if (vistaActual === 'saldos') {
                 let total = 0;
                 html = `<h2 class="text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6">Disponibilidad en Cuentas</h2>`;
                 datosLocales.saldos.forEach(s => {
                     total += Number(s.SALDO_USD);
-                    html += `<div class="industrial-card p-5 rounded-2xl mb-3 flex justify-between items-center"><span class="font-black text-blue-400 uppercase text-xs">${s.BILLETERA}</span><span class="text-xl font-bold text-white">$${Number(s.SALDO_USD).toFixed(2)}</span></div>`;
+                    html += `<div class="industrial-card p-5 rounded-2xl mb-3 flex justify-between items-center"><span class="font-black text-blue-400 uppercase text-xs">${s.BILLETERA}</span><span class="text-xl font-mono-custom font-bold text-white">$${Number(s.SALDO_USD).toFixed(2)}</span></div>`;
                 });
                 html = `<div class="industrial-card p-8 rounded-3xl mb-8 text-center bg-gradient-to-b from-blue-900/30 to-transparent border-t-2 border-blue-500"><p class="text-[9px] text-blue-300 font-black uppercase tracking-[0.4em] mb-2">Total Efectivo</p><p class="text-4xl font-black text-white">$${total.toFixed(2)}</p></div>` + html;
             }
             container.innerHTML = html || '<p class="text-center text-slate-500 py-20 text-xs">Sin registros</p>';
         }
 
+        // FUNCIONES DE MODALES Y PAGOS
         function prepararPago(gasto) {
             gastoSeleccionado = gasto;
             const falta = (Number(gasto.MONTO_REAL_USD) - Number(gasto.ABONADO_USD || 0)).toFixed(2);
@@ -178,16 +278,12 @@
         async function confirmarPago(esTotal = false) {
             const monto = parseFloat(document.getElementById('p-monto-abono').value);
             if (!monto && !esTotal) return alert("Ingresa un monto");
-            
             const btn = document.getElementById('btn-confirmar-pago');
             btn.innerText = "Procesando..."; btn.disabled = true;
-
             const payload = { accion: "actualizarPago", id: gastoSeleccionado.ID, montoAbonar: monto, pagoTotal: esTotal };
             await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-            
             btn.innerText = "Confirmar"; btn.disabled = false;
-            cerrarModales();
-            sincronizar();
+            cerrarModales(); sincronizarTodo();
         }
 
         async function guardarGasto() {
@@ -197,22 +293,38 @@
             const bcv = parseFloat(document.getElementById('g-bcv').value);
             const binance = parseFloat(document.getElementById('g-binance').value);
             const billetera = document.getElementById('g-billetera').value;
-            if(!desc || !monto) return alert("Completa los datos");
+            if(!desc || !monto || !bcv || !binance) return alert("Completa los datos");
             btn.innerText = "Guardando..."; btn.disabled = true;
             const payload = { accion: "agregarGasto", descripcion: desc, montoUSD: monto, tasaBCV: bcv, montoBS: monto*bcv, tasaBinance: binance, montoReal: (monto*bcv)/binance, billetera: billetera };
             await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-            cerrarModales(); sincronizar();
+            cerrarModales(); sincronizarTodo();
+        }
+
+        async function guardarIngreso() {
+            const btn = document.getElementById('btn-guardar-ingreso');
+            const fecha = document.getElementById('i-fecha').value;
+            const desc = document.getElementById('i-desc').value;
+            const monto = parseFloat(document.getElementById('i-monto').value);
+            const billetera = document.getElementById('i-billetera').value;
+            if(!fecha || !desc || !monto) return alert("Completa los datos");
+            btn.innerText = "Registrando..."; btn.disabled = true;
+            const payload = { accion: "agregarIngreso", fecha: fecha, descripcion: desc, montoUSD: monto, billetera: billetera };
+            await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+            cerrarModales(); sincronizarTodo();
         }
 
         async function eliminarGasto(id) {
             if(!confirm("¿Eliminar este registro?")) return;
+            document.getElementById('main-content').innerHTML = '<div class="py-20 text-center"><span class="loader"></span></div>';
             await fetch(API_URL, { method: "POST", body: JSON.stringify({ accion: "eliminarGasto", id: id }) });
-            sincronizar();
+            sincronizarTodo();
         }
 
         function abrirModal(id) { document.getElementById(id).classList.add('active'); }
         function cerrarModales() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
-        sincronizar();
+        
+        // Arrancar la app al abrir
+        sincronizarTodo();
     </script>
 </body>
 </html>
